@@ -1,0 +1,5 @@
+default['base']['wordpress']['dir'] = '/var/proj/base-blog'
+default['base']['wordpress']['url'] = 'http://wordpress.org/latest.tar.gz'
+default['base']['wordpress']['s3_path'] = 's3://base.com/wordpress/'
+default['base']['wordpress']['s3_backup_path'] = node['base']['wordpress']['s3_path'] + 'daily_backup/'
+default['base']['wordpress']['s3_region'] = 'ap-southeast-1'

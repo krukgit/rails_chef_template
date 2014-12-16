@@ -1,0 +1,22 @@
+127.0.0.1 localhost
+
+# The following lines are desirable for IPv6 capable hosts
+::1 ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+ff02::3 ip6-allhosts
+
+<% @servers.each do |n| %>
+   <% if n["ec2"] %>
+      <% region = n["ec2"]["placement_availability_zone"].match(/(\w*\-\w*\-\d*).*/)[1] %>
+      <% if region == @region && n["ec2"]["local_ipv4"] %>
+<%= n["ec2"]["local_ipv4"] -%> <%= n.name -%> <%= n["ec2"]["hostname"] -%>
+
+      <% elsif n["ec2"]["public_ipv4"] %>
+<%= n["ec2"]["public_ipv4"] -%> <%= n.name -%> <%= n["ec2"]["public_hostname"] -%>
+
+      <% end %>
+   <% end %>
+<% end %>

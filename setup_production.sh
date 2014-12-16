@@ -1,11 +1,16 @@
 #!/bin/bash
 
-node_name=web1
-key_name=production
-key_path=~/.ssh/$key_name.pem
-security_group=sg-yours #edit
-subnet=subnet-yours #edit
+cookbook=base
+
+security_group=sg-change_this
+subnet=subnet-change_this
 image=ami-a4b792f6
+
+node_name=$cookbook-web1
+
+key_name=$cookbook-production
+key_path=~/.ssh/$cookbook/aws/$key_name.pem
+iam_role=$cookbook-production
 
 if [ ! -f $key_path ]; then
     echo "$key does not exist!"
@@ -20,8 +25,8 @@ knife ec2 server create \
     --identity-file $key_path \
     --node-name $node_name \
     --environment production \
-    --run-list "recipe[kruk],recipe[kruk::rails_server],recipe[kruk::deploy]" \
-    --iam-profile web-production \
+    --run-list "recipe[$cookbook],recipe[$cookbook::rails_server],recipe[$cookbook::deploy]" \
+    --iam-profile $iam_role \
     --associate-public-ip \
     --subnet $subnet \
     --image $image
