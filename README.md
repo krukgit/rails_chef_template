@@ -297,3 +297,8 @@ Create a staging branch in Rails project\'s repostiory
 
     git checkout -b staging
     git push origin staging
+
+Create environments
+
+    knife environment create staging
+    knife environment create production

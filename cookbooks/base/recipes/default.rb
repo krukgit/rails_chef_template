@@ -40,6 +40,20 @@ template "/etc/sudoers" do
   mode "0440"
 end
 
+template "/etc/ssh/ssh_config" do
+  source "etc/ssh/ssh_config"
+  owner "root"
+  group "root"
+  mode "644"
+  notifies :restart, "service[ssh]", :delayed
+end
+
+service "ssh" do
+  provider Chef::Provider::Service::Upstart
+  action :nothing
+  supports restart: true
+end
+
 # install packages
 ['git', 'emacs', 'vim', 'openssl', 'unzip', 'python-pip',
  'postgresql-client-common', 'postgresql-client-9.3'].each do |pkg|
