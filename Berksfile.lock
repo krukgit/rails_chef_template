@@ -1,6 +1,7 @@
 DEPENDENCIES
   apt
   logrotate
+  magic_shell
   nginx
   ntp
   rvm
@@ -15,6 +16,7 @@ GRAPH
   chef_gem (0.1.0)
   java (1.22.0)
   logrotate (1.6.0)
+  magic_shell (1.0.0)
   nginx (2.7.4)
     apt (~> 2.2)
     bluepill (~> 2.3)
