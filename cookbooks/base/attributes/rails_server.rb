@@ -1,12 +1,12 @@
 # rvm
-normal['rvm']['rubies'] = ['2.1.3']
+normal['rvm']['rubies'] = ['2.2.1']
 normal['rvm']['default_ruby'] = node['rvm']['rubies'].first
 normal['rvm']['user_default_ruby'] = node['rvm']['default_ruby']
 normal['rvm']['gems'][node['rvm']['default_ruby']] = [{name: "bundler"}, {name: "rake"}]
 normal['rvm']['gem_package']['rvm_string'] = node['rvm']['default_ruby']
 
 # nginx
-normal['nginx']['version'] = '1.6.2'
+normal['nginx']['version'] = '1.7.10'
 normal['nginx']['dir'] = '/etc/nginx'
 normal['nginx']['log_dir'] = '/var/log/nginx'
 normal['nginx']['binary'] = "/opt/nginx-#{node['nginx']['version']}/sbin"
@@ -25,7 +25,7 @@ normal['nginx']['source']['default_configure_flags'] = ["--prefix=#{node['nginx'
 normal['nginx']['source']['url'] = "http://nginx.org/download/nginx-#{node['nginx']['source']['version']}.tar.gz"
 
 # passenger
-normal['nginx']['passenger']['version'] = '4.0.52'
+normal['nginx']['passenger']['version'] = '5.0.1'
 normal['nginx']['passenger']['ruby'] = "#{node['rvm']['root_path']}/wrappers/ruby-#{node['rvm']['default_ruby']}/ruby"
 normal['nginx']['passenger']['gem_binary'] = "#{node['rvm']['root_path']}/wrappers/ruby-#{node['rvm']['default_ruby']}/gem"
 normal['nginx']['passenger']['root'] = "#{node['rvm']['root_path']}/gems/ruby-#{node['rvm']['default_ruby']}/gems/passenger-#{node['nginx']['passenger']['version']}"
