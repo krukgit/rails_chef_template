@@ -1,4 +1,5 @@
 # variables
+<% cookbook_name = @cookbook_name %>
 <% server_name = (node.chef_environment == 'production' ? '' : node.chef_environment) + node[cookbook_name]['server_url'] %>
 
 # ELB Health Check
@@ -37,36 +38,4 @@ server {
         passenger_enabled on;
     }
 <% end %>
-
-    location /blog {
-        proxy_pass https://blog.<%= server_name %>/;
-    }
 }
-
-<% if node.run_list.include? "recipe[#{cookbook_name}::wordpress]" %>
-# Wordpress server
-server {
-    listen 80;
-    root <%= node[cookbook_name]['wordpress']['dir'] %>;
-    server_name blog.<%= server_name %>;
-    client_max_body_size 20m;
-
-    index    index.html  index.php;
-    try_files $uri $uri/ /blog/index.php?q=$uri&$args;
-
-    if (!-e $request_filename) {
-        rewrite ^.+?(/blog/.*.php)$ $1 last;
-        rewrite ^ /blog/index.php last;
-    }
-
-    location ~ \.php$ {
-        try_files $uri =404;
-        fastcgi_intercept_errors on;
-        include fastcgi_params;
-        fastcgi_index  index.php;
-        fastcgi_param SCRIPT_NAME $fastcgi_script_name;
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-        fastcgi_pass unix:/var/run/php5-fpm.sock;
-    }
-}
-<% end %>
