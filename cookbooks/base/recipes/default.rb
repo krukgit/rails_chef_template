@@ -7,11 +7,11 @@ execute "dpkg-reconfigure-locales" do
   command "dpkg-reconfigure locales"
 end
 
-# setup ntp
-include_recipe "ntp"
-
 # update repositories
 include_recipe "apt"
+
+# setup ntp
+include_recipe "ntp"
 
 # setup hostname
 file '/etc/hostname' do
