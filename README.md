@@ -1,30 +1,16 @@
-Overview
-========
-
-Every Chef installation needs a Chef Repository. This is the place where cookbooks, roles, config files and other artifacts for managing systems with Chef will live. We strongly recommend storing this repository in a version control system such as Git and treat it like source code.
-
-While we prefer Git, and make this repository available via GitHub, you are welcome to download a tar or zip archive and use your favorite version control system to manage the code.
-
-Getting started
-======================
-
-Copy the content of this repository to a new repository, or to chef-repo/ folder in your Rails project repository (don't forget about .chef folder).
-
-
 Create validation key
 ----------------------
 
 Go to `https://manage.opscode.com/login` and create a new organization for your startup. Refresh the page and switch the organization to your startup. Navigate to `Administration` -> `Reset Validation Key`.
 Copy the newly generated key to ~/.chef/name-validator.pem.
 
-Edit .chef/knife.rb as follows
-
 Create Encrypted Data Bag secret
 ----------------------
 
 Run `sudo bash -c "openssl rand -base64 512 | tr -d '\r\n' > /etc/chef/organization_secret"` to generate the secret used for encrypting and decrypting content of data bags.
 
-Edit .chef/knife.rb config
+
+Edit .chef/knife.rb
 ----------------------
 
 * `node_name` - A name that identifies your computer
@@ -34,6 +20,8 @@ Edit .chef/knife.rb config
 * `knife[:aws_credential_file]` - Path to your AWS credentials
 * `knife[:region]` - Your default AWS region
 * `knife[:secret_file]` - data bag secret path
+
+If your project has more than one maintainer, copy the file to .chef/knife.rb.example and add .chef/knife.rb to your project's .gitignore
 
 Update cookbook attributes
 ----------------------
@@ -48,12 +36,11 @@ Change project variables:
 
 * `default['base']['rvm_path']` to `default['organization']['rvm_path']`
 * `default['base']['project_dir'] = "/var/proj/base-#{node.chef_environment}"` to `default['organization']['project_dir'] = "/var/proj/organization-#{node.chef_environment}"`
+* `default['base']['server_url']` to `default['organization']['server_url']` and `base.com` to your website url
 
-Modify `attributes/deploy.rb` and `attributes/wordpress.rb` appropriately.
+Modify `attributes/deploy.rb` appropriately.
 
 Update `templates/default/htpasswd.erb` (default credentials base:Base2014).
-
-Update `templates/default/wp-config.php.erb` with content from https://api.wordpress.org/secret-key/1.1/salt/
 
 Setup AWS
 ----------------------
@@ -137,11 +124,7 @@ Create two roles: *organization-production* and *organization-staging*. Role typ
 Navigate to RDS. Setup PostgreSQL db.m1.small with multi AZ deployment and 10 GB storage. Select previously created *organization-db* as security group.
 Select backup and maintenance windows to be the early morning in your timezone.
 
-### Instance definition
-
-Update setup\_staging.sh and setup\_production.sh with security group ids, role names, key names and ami id.
-
-Add your AWS credentials to ~/.chef/aws.credentials
+### Upload cookbooks
 
 Run `bundle install`
 
@@ -157,7 +140,42 @@ Create config bag
 
     knife data bag create config --secret-file /etc/chef/organization_secret
 
-config/newrelic (substitute `license_key` and `app_name`)
+Every `item` you add to this data bag will generate a corresponding `config/item.yml` configuration file.
+Items should have three keys: `id`, `staging`, `production`. Id is the name of the item. Content of `staging` and `production` will populate the yml file in staging and production environment respectively.
+
+You can generate json config from existing `yml` files running the following command in ruby console
+
+    config='database'; puts JSON.pretty_generate({id: config}.merge(YAML.load(File.read("config/#{config}.yml")).slice('staging','production'))); 1
+
+Sample config files:
+
+Create `config/database.yml`
+
+    knife data bag create config database --secret-file /etc/chef/organization_secret
+    {
+        "id": "database",
+        "production": {
+            "adapter": "postgresql",
+            "encoding": "unicode",
+            "username": "<USERNAME>",
+            "host": "<HOST>",
+            "password": "<PASSWORD>",
+            "port": 5432,
+            "database": "<DBNAME>"
+        },
+        "staging": {
+            "adapter": "postgresql",
+            "encoding": "unicode",
+            "username": "<USERNAME>",
+            "host": "<HOST>",
+            "password": "<PASSWORD>",
+            "port": 5432,
+            "database": "<DBNAME>_staging"
+        }
+    }
+
+
+Create `config/newrelic.yml`
 
     knife data bag create config newrelic --secret-file /etc/chef/organization_secret
     {
@@ -212,32 +230,7 @@ config/newrelic (substitute `license_key` and `app_name`)
         }
     }
 
-Create `config database` data bag
-
-    knife data bag create config newrelic --secret-file /etc/chef/organization_secret
-    {
-        "id": "database",
-        "production": {
-            "adapter": "postgresql",
-            "encoding": "unicode",
-            "username": "<USERNAME>",
-            "host": "<HOST>",
-            "password": "<PASSWORD>",
-            "port": 5432,
-            "database": "<DBNAME>"
-        },
-        "staging": {
-            "adapter": "postgresql",
-            "encoding": "unicode",
-            "username": "<USERNAME>",
-            "host": "<HOST>",
-            "password": "<PASSWORD>",
-            "port": 5432,
-            "database": "<DBNAME>_staging"
-        }
-    }
-
-Create `config secrets` data bag
+Create `config/secrets.yml`
 
     (cd .. && rake secret)
     (cd .. && rake secret)
@@ -302,3 +295,13 @@ Create environments
 
     knife environment create staging
     knife environment create production
+
+Instance definition
+---------------------
+
+Add your AWS credentials to ~/.chef/aws.credentials
+
+    AWSAccessKeyId=<ACCESS_KEY>
+    AWSSecretKey=<SECRET_KEY>
+
+Update `setup_staging.sh` and `setup_production.sh` with security group ids, role names, key names and ami id.
