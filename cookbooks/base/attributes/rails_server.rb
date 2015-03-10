@@ -4,6 +4,7 @@ normal['rvm']['default_ruby'] = node['rvm']['rubies'].first
 normal['rvm']['user_default_ruby'] = node['rvm']['default_ruby']
 normal['rvm']['gems'][node['rvm']['default_ruby']] = [{name: "bundler"}, {name: "rake"}]
 normal['rvm']['gem_package']['rvm_string'] = node['rvm']['default_ruby']
+normal['rvm']['gpg']['keyserver'] = "hkp://keys.gnupg.net"
 
 # nginx
 normal['nginx']['version'] = '1.7.10'
