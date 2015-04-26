@@ -76,8 +76,8 @@ Vagrant.configure("2") do |config|
   # and the path to the validation key (relative to this Vagrantfile).
   #
   # config.vm.provision :chef_client do |chef|
-  #   chef.chef_server_url = "https://api.opscode.com/organizations/folr"
-  #   chef.validation_client_name = "folr-validator"
-  #   chef.validation_key_path = ".chef/folr-validator.pem"
+  #   chef.chef_server_url = "https://api.opscode.com/organizations/base"
+  #   chef.validation_client_name = "base-validator"
+  #   chef.validation_key_path = ".chef/base-validator.pem"
   # end
 end
