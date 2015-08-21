@@ -234,7 +234,7 @@ Create `config/secrets.yml`
 
     (cd .. && rake secret)
     (cd .. && rake secret)
-    knife data bag create config newrelic --secret-file /etc/chef/organization_secret
+    knife data bag create config secrets --secret-file /etc/chef/organization_secret
     {
         "id": "secrets",
         "production": {
